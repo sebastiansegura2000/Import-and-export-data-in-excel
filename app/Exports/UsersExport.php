@@ -8,6 +8,9 @@ class UsersExport implements FromCollection, WithHeadings
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    //function to colect the data of the database
+
     public function collection()
     {
         return User::select("id", "name", "email")->get();
@@ -17,6 +20,9 @@ class UsersExport implements FromCollection, WithHeadings
      *
      * @return response()
      */
+
+    //function to take the headers in the excel
+
     public function headings(): array
     {
         return ["ID", "Name", "Email"];

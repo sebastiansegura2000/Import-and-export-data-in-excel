@@ -7,6 +7,8 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\User;
+use App\Jobs\ImportExcelDataJob;
+use Illuminate\Support\Facades\Storage;
 
 
 class UserController extends Controller
@@ -23,14 +25,14 @@ class UserController extends Controller
         return view('users', compact('users'));
     }
 
-
+    // function to export the users table to a excel
 
     public function export()
     {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
 
-
+    //function to import data in the users table
 
     public function import()
     {
@@ -47,21 +49,42 @@ class UserController extends Controller
         return view('index', compact('users'));
     }
 
+    //function to import data in the users table with conditions
+
+    // public function importExcelData(Request $request)
+    // {
+
+    //     $request->validate([
+    //         'import_file'=>[
+    //             'required','file'
+    //         ],
+    //     ]);
+
+    //     Excel::import(new UsersImport, $request->file('import_file'));
+
+    //     return redirect()->back()->with('status','Imported Succes');
+
+    // }
+
 
     public function importExcelData(Request $request)
     {
-
         $request->validate([
             'import_file'=>[
                 'required','file'
             ],
         ]);
+         // Guardar el archivo temporalmente
+        $filePath = $request->file('import_file')->store('temp');
 
-        Excel::import(new UsersImport, $request->file('import_file'));
+        // Agregar la importación como trabajo en la cola
+        ImportExcelDataJob::dispatch($filePath);
 
-        return redirect()->back()->with('status','Imported Succes');
-
+        return redirect()->back()->with('status', 'Imported Succes');
     }
+
+
+    //function to export the users table in a excel or csv or xls
 
     public function exportDataInExcel(Request $request)
     {

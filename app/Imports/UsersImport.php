@@ -17,6 +17,9 @@ class UsersImport implements  WithHeadingRow, ToCollection
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
+
+    //function to create a user with a model function
+
     // public function model(array $row)
     // {
     //     return new User([
@@ -31,6 +34,8 @@ class UsersImport implements  WithHeadingRow, ToCollection
     * @param Collection $collection
     */
 
+    //function to create a user with a collection function
+
     // public function collection(Collection $rows)
     // {
     //     foreach ($rows as $row)
@@ -43,6 +48,8 @@ class UsersImport implements  WithHeadingRow, ToCollection
     //     }
     // }
 
+    //function to create or update a user through Excel.
+
     public function collection(Collection $rows)
     {
         foreach ($rows as $row)
@@ -51,7 +58,7 @@ class UsersImport implements  WithHeadingRow, ToCollection
 
             if($user)
             {
-                // Usuario existente, actualiza los datos
+                // if a user exist, update a user
                 $user->update([
                     'name' => $row['name'],
                     'password' => Hash::make($row['password']),
@@ -59,7 +66,7 @@ class UsersImport implements  WithHeadingRow, ToCollection
             }
             else
             {
-                // Usuario no existe, crea uno nuevo
+                // if a user doesn't exist, create a new user
                 User::create([
                     'email' => $row['email'],
                     'name' => $row['name'],
