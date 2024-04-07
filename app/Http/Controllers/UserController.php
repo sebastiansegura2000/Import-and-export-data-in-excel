@@ -74,11 +74,16 @@ class UserController extends Controller
                 'required','file'
             ],
         ]);
-         // Guardar el archivo temporalmente
+
+        // Obtener el correo del usuario actualmente autenticado
+        $userEmail = auth()->user()->email;
+
+        // Guardar el archivo temporalmente
         $filePath = $request->file('import_file')->store('temp');
 
         // Agregar la importación como trabajo en la cola
-        ImportExcelDataJob::dispatch($filePath);
+        // Despachar el trabajo con el correo del usuario como argumento adicional
+        ImportExcelDataJob::dispatch($filePath, $userEmail);
 
         return redirect()->back()->with('status', 'Imported Succes');
     }
