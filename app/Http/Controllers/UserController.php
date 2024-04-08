@@ -10,9 +10,18 @@ use App\Models\User;
 use App\Jobs\ImportExcelDataJob;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @OA\Info(
+ *      title="Nombre de tu API",
+ *      version="1.0.0",
+ *      description="Descripción de tu API",
+ * )
+ */
 
 class UserController extends Controller
 {
+
+
 
     /**
     * @return \Illuminate\Support\Collection
@@ -131,6 +140,24 @@ class UserController extends Controller
 
     //   //***APi***\\
 
+
+
+    /**
+     * @OA\Get(
+     *      path="/api/users",
+     *      operationId="getUsersList",
+     *      tags={"Users"},
+     *      summary="Get list of users",
+     *      description="Returns list of users",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *      ),
+     *      security={
+     *          {"sanctum": {}}
+     *      }
+     * )
+     */
     public function indexAPI()
     {
         $users = User::all();
@@ -138,10 +165,68 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+
+    /**
+     * @OA\Get(
+     *      path="/api/users/exportAPI",
+     *      operationId="exportUsers",
+     *      tags={"Users"},
+     *      summary="Export users data to Excel",
+     *      description="Allows exporting users data to Excel format",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *      ),
+     *      security={
+     *          {"sanctum": {}}
+     *      }
+     * )
+     */
+
     public function exportAPI()
     {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
+
+    /**
+     * @OA\Post(
+     *      path="/api/users/importExcelDataAPI",
+     *      operationId="importUsers",
+     *      tags={"Users"},
+     *      summary="Import users data from Excel",
+     *      description="Allows importing users data from an Excel file",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Excel file to import",
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  required={"import_file"},
+     *                  @OA\Property(
+     *                      property="import_file",
+     *                      description="Excel file to import",
+     *                      type="file",
+     *                  ),
+     *              ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string",
+     *                  example="Importación exitosa"
+     *              )
+     *          )
+     *      ),
+     *      security={
+     *          {"sanctum": {}}
+     *      }
+     * )
+     */
 
     public function importExcelDataAPI(Request $request)
     {
