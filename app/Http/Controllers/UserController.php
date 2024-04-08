@@ -9,6 +9,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\User;
 use App\Jobs\ImportExcelDataJob;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ExportedDataEmail;
 
 /**
  * @OA\Info(
@@ -158,6 +160,9 @@ class UserController extends Controller
      *      }
      * )
      */
+
+    //Function to get the all data of the table users API
+
     public function indexAPI()
     {
         $users = User::all();
@@ -182,6 +187,8 @@ class UserController extends Controller
      *      }
      * )
      */
+
+    // function to export the users table to a excel API
 
     public function exportAPI()
     {
@@ -228,19 +235,21 @@ class UserController extends Controller
      * )
      */
 
+    //  function to import data in the users table with conditions API
+
     public function importExcelDataAPI(Request $request)
     {
         $request->validate([
             'import_file' => ['required', 'file'],
         ]);
 
-        // Obtener el correo electrónico del usuario autenticado actualmente
+        // Get the email of the currently authenticated user
         $userEmail = auth()->check() ? auth()->user()->email : null;
 
-        // Guardar el archivo temporalmente
+        // Save the file temporarily
         $filePath = $request->file('import_file')->store('temp');
 
-        // Agregar la importación como un trabajo a la cola
+        // Add the import as a job to the queue
         ImportExcelDataJob::dispatch($filePath, $userEmail);
 
         return response()->json(['message' => 'Importación exitosa']);
