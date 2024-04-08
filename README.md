@@ -8,13 +8,13 @@
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/sebastiansegura2000/Import-and-export-data-in-excel.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd Import-and-export-data-in-excel
 ```
 
 Start the server
