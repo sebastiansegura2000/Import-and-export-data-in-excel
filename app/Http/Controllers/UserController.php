@@ -18,12 +18,12 @@ class UserController extends Controller
     * @return \Illuminate\Support\Collection
     */
 
-    public function index()
-    {
-        $users = User::get();
+    // public function index()
+    // {
+    //     $users = User::get();
 
-        return view('users', compact('users'));
-    }
+    //     return view('users', compact('users'));
+    // }
 
     // function to export the users table to a excel
 
@@ -75,14 +75,23 @@ class UserController extends Controller
             ],
         ]);
 
-        // Obtener el correo del usuario actualmente autenticado
-        $userEmail = auth()->user()->email;
+        // Get the email of the currently authenticated user
+        // $userEmail = auth()->user()->email;
 
-        // Guardar el archivo temporalmente
+        // Check if there is an authenticated user
+        if (auth()->check()) {
+            // Get the email of the currently authenticated user
+            $userEmail = auth()->user()->email;
+        } else {
+            // If there is no authenticated user, set the email to nulls
+            $userEmail = null;
+        }
+
+        // Save the file temporarily
         $filePath = $request->file('import_file')->store('temp');
 
-        // Agregar la importación como trabajo en la cola
-        // Despachar el trabajo con el correo del usuario como argumento adicional
+        // Add the import as a job to the queue
+        // Dispatch the job with the user's email as an additional argument
         ImportExcelDataJob::dispatch($filePath, $userEmail);
 
         return redirect()->back()->with('status', 'Imported Succes');
@@ -119,6 +128,38 @@ class UserController extends Controller
         return Excel::download(new UsersExport, $filename, $exportFormat);
     }
 
+
+    //   //***APi***\\
+
+    public function indexAPI()
+    {
+        $users = User::all();
+
+        return response()->json($users);
+    }
+
+    public function exportAPI()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+    public function importExcelDataAPI(Request $request)
+    {
+        $request->validate([
+            'import_file' => ['required', 'file'],
+        ]);
+
+        // Obtener el correo electrónico del usuario autenticado actualmente
+        $userEmail = auth()->check() ? auth()->user()->email : null;
+
+        // Guardar el archivo temporalmente
+        $filePath = $request->file('import_file')->store('temp');
+
+        // Agregar la importación como un trabajo a la cola
+        ImportExcelDataJob::dispatch($filePath, $userEmail);
+
+        return response()->json(['message' => 'Importación exitosa']);
+    }
 
 
 

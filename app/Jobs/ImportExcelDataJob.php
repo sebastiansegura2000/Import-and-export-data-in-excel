@@ -52,8 +52,10 @@ class ImportExcelDataJob implements ShouldQueue
 
         try
         {
-            // $message = "Archivo subido correctamente";
-            $message = "Archivo subido correctamente por: " . $this->userEmail;
+            // $message = "File uploaded successfully";
+            // $message = "File uploaded successfully by: " . $this->userEmail;
+            $message = $this->userEmail ? "File uploaded successfully by: " . $this->userEmail : "File uploaded successfully";
+
 
             $client = new MqttClient("127.0.0.1", 1883, 'test-publisher', MqttClient::MQTT_3_1, null);
             $client->connect(null, true);
